@@ -133,7 +133,20 @@ void firmware_main()
 			delay_ms(2000);
 		}
 		else
-			delay_ms(5000); // slightly longer LED visible for error
+		{ // try one more time.
+		    enum STATUSCODE status = fpga_reset();
+			session_info_t si = {0};
+			if (status == OK_FPGA_RESET)
+			    status = glitch(&null_logger, &si, false);
+			if (status == OK_GLITCH_SUCCESS)
+			{
+				leds_set_pattern_delayed(&lp_off, 2000);
+				delay_ms(2000);
+			}
+			else{
+				delay_ms(5000); // slightly longer LED visible for error
+			}
+		}
 	}
 	enter_sleep();
 }
